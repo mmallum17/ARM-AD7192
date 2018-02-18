@@ -45,6 +45,7 @@
 /******************************************************************************/
 #include "AD7190.h"     // AD7190 definitions.
 #include "TIME.h"       // TIME definitions.
+#include "ssd1306.h"
 
 /***************************************************************************//**
  * @brief Writes data into a register.
@@ -92,11 +93,22 @@ unsigned long AD7190_GetRegisterValue(unsigned char registerAddress,
     unsigned char registerWord[5] = {0, 0, 0, 0, 0}; 
     unsigned long buffer          = 0x0;
     unsigned char i               = 0;
+    char display[30];
     
     registerWord[0] = AD7190_COMM_READ |
                       AD7190_COMM_ADDR(registerAddress);
-    SPI_Read(AD7190_SLAVE_ID * modifyCS, registerWord, bytesNumber + 1);
-    for(i = 1; i < bytesNumber + 1; i++) 
+    sprintf(display,"%d", registerWord[0]);
+    clearScreen();
+    ssd1306_WriteString(display, 1);
+    updateScreen();
+
+    SPI_Read(AD7190_SLAVE_ID * modifyCS, registerWord, bytesNumber/* + 1*/);
+
+    sprintf(display,"%d", registerWord[0]);
+    clearScreen();
+    ssd1306_WriteString(display, 1);
+    updateScreen();
+    for(/*i = 1; */i = 0; i < bytesNumber/* + 1*/; i++)
     {
         buffer = (buffer << 8) + registerWord[i];
     }
@@ -113,12 +125,18 @@ unsigned char AD7190_Init(void)
 {
     unsigned char status = 1;
     unsigned char regVal = 0;
+	char display[30];
     
     SPI_Init(0, 1000000, 1, 0);
     AD7190_Reset();
     /* Allow at least 500 us before accessing any of the on-chip registers. */
     TIME_DelayMs(1);
     regVal = AD7190_GetRegisterValue(AD7190_REG_ID, 1, 1);
+    /*sprintf(display,"%d", regVal);
+	clearScreen();
+    ssd1306_WriteString(display, 1);
+    updateScreen();*/
+
     if( (regVal & AD7190_ID_MASK) != ID_AD7190)
     {
         status = 0;
@@ -217,10 +235,10 @@ void AD7190_Calibrate(unsigned char mode, unsigned char channel)
     oldRegValue = AD7190_GetRegisterValue(AD7190_REG_MODE, 3, 1);
     oldRegValue &= ~AD7190_MODE_SEL(0x7);
     newRegValue = oldRegValue | AD7190_MODE_SEL(mode);
-    ADI_PART_CS_LOW; 
+    ADI_PART_CS_LOW();
     AD7190_SetRegisterValue(AD7190_REG_MODE, newRegValue, 3, 0); // CS is not modified.
     AD7190_WaitRdyGoLow();
-    ADI_PART_CS_HIGH;
+    ADI_PART_CS_HIGH();
 }
 
 /***************************************************************************//**
@@ -258,14 +276,12 @@ unsigned long AD7190_SingleConversion(void)
     unsigned long command = 0x0;
     unsigned long regData = 0x0;
  
-    command = AD7190_MODE_SEL(AD7190_MODE_SINGLE) | 
-              AD7190_MODE_CLKSRC(AD7190_CLK_INT) |
-              AD7190_MODE_RATE(0x060);    
-    ADI_PART_CS_LOW;
+    command = AD7190_MODE_SEL(AD7190_MODE_SINGLE) | AD7190_MODE_CLKSRC(AD7190_CLK_INT) | AD7190_MODE_RATE(0x060);
+    ADI_PART_CS_LOW();
     AD7190_SetRegisterValue(AD7190_REG_MODE, command, 3, 0); // CS is not modified.
     AD7190_WaitRdyGoLow();
     regData = AD7190_GetRegisterValue(AD7190_REG_DATA, 3, 0);
-    ADI_PART_CS_HIGH;
+    ADI_PART_CS_HIGH();
     
     return regData;
 }
@@ -284,14 +300,14 @@ unsigned long AD7190_ContinuousReadAvg(unsigned char sampleNumber)
     command = AD7190_MODE_SEL(AD7190_MODE_CONT) | 
               AD7190_MODE_CLKSRC(AD7190_CLK_INT) |
               AD7190_MODE_RATE(0x060);
-    ADI_PART_CS_LOW;
+    ADI_PART_CS_LOW();
     AD7190_SetRegisterValue(AD7190_REG_MODE, command, 3, 0); // CS is not modified.
     for(count = 0;count < sampleNumber;count ++)
     {
         AD7190_WaitRdyGoLow();
         samplesAverage += AD7190_GetRegisterValue(AD7190_REG_DATA, 3, 0); // CS is not modified.
     }
-    ADI_PART_CS_HIGH;
+    ADI_PART_CS_HIGH();
     samplesAverage = samplesAverage / sampleNumber;
     
     return samplesAverage ;
@@ -307,7 +323,7 @@ unsigned long AD7190_TemperatureRead(void)
     unsigned char temperature = 0x0;
     unsigned long dataReg = 0x0;
     
-    AD7190_RangeSetup(0, AD7190_CONF_GAIN_1);
+//    AD7190_RangeSetup(0, AD7190_CONF_GAIN_1);
     AD7190_ChannelSelect(AD7190_CH_TEMP_SENSOR);
     dataReg = AD7190_SingleConversion();
     dataReg -= 0x800000;

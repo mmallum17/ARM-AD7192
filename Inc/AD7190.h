@@ -46,6 +46,7 @@
 /******************************************************************************/
 /***************************** Include Files **********************************/
 /******************************************************************************/
+#include "stm32l1xx_hal.h"
 #include "Communication.h"
 
 /******************************************************************************/
@@ -55,8 +56,12 @@
 /* SPI slave device ID */
 #define AD7190_SLAVE_ID         1
 
+/* SPI CS Pins */
+#define ADI_PART_CS_HIGH()	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET)
+#define ADI_PART_CS_LOW()	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET)
+
 /* AD7190 GPIO */
-#define AD7190_RDY_STATE       GPIO1_STATE
+#define AD7190_RDY_STATE       HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_6)
 
 /* AD7190 Register Map */
 #define AD7190_REG_COMM         0 // Communications Register (WO, 8-bit) 
@@ -88,7 +93,7 @@
 /* Mode Register Bit Designations (AD7190_REG_MODE) */
 #define AD7190_MODE_SEL(x)      (((x) & 0x7) << 21) // Operation Mode Select.
 #define AD7190_MODE_DAT_STA     (1 << 20)           // Status Register transmission.
-#define AD7190_MODE_CLKSRC(x)   ((x) & 0x3) << 18)  // Clock Source Select.
+#define AD7190_MODE_CLKSRC(x)   (((x) & 0x3) << 18)  // Clock Source Select.
 #define AD7190_MODE_SINC3       (1 << 15)           // SINC3 Filter Select.
 #define AD7190_MODE_ENPAR       (1 << 13)           // Parity Enable.
 #define AD7190_MODE_SCYCLE      (1 << 11)           // Single cycle conversion.

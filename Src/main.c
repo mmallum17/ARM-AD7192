@@ -42,6 +42,7 @@
 
 /* USER CODE BEGIN Includes */
 #include "ssd1306.h"
+#include "AD7190.h"
 
 /* USER CODE END Includes */
 
@@ -83,6 +84,8 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
+  unsigned long buffer;
+  char display[30];
 
   /* USER CODE END Init */
 
@@ -103,6 +106,29 @@ int main(void)
   clearScreen();
   ssd1306_WriteString("TEST", 1);
   updateScreen();
+
+  if(AD7190_Init())
+  {
+	  ssd1306_WriteString("Part Present", 1);
+	  updateScreen();
+  }
+  else
+  {
+	  ssd1306_WriteString("Part Not Present", 1);
+	  updateScreen();
+  }
+
+  buffer = AD7190_GetRegisterValue(AD7190_REG_CONF,3, 1);
+  sprintf(display,"%lu", buffer);
+  clearScreen();
+  ssd1306_WriteString(display, 1);
+  updateScreen();
+
+  buffer = AD7190_TemperatureRead();
+  sprintf(display,"%lu", buffer);
+  clearScreen();
+  ssd1306_WriteString(display, 1);
+  updateScreen();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -110,6 +136,9 @@ int main(void)
   while (1)
   {
   /* USER CODE END WHILE */
+	  /*	 AD7190_Reset();
+	  	 HAL_Delay(1);*/
+
 
   /* USER CODE BEGIN 3 */
 
@@ -197,8 +226,8 @@ static void MX_SPI1_Init(void)
   hspi1.Init.Mode = SPI_MODE_MASTER;
   hspi1.Init.Direction = SPI_DIRECTION_2LINES;
   hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
-  hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
-  hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
+  hspi1.Init.CLKPolarity = SPI_POLARITY_HIGH;
+  hspi1.Init.CLKPhase = SPI_PHASE_2EDGE;
   hspi1.Init.NSS = SPI_NSS_HARD_OUTPUT;
   hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_8;
   hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;

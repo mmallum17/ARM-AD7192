@@ -41,7 +41,10 @@
 /******************************************************************************/
 /* Include Files                                                              */
 /******************************************************************************/
+#include "stm32l1xx_hal.h"
 #include "Communication.h"
+
+extern SPI_HandleTypeDef hspi1; /*SPI Handler*/
 
 /***************************************************************************//**
  * @brief Initializes the I2C communication peripheral.
@@ -54,7 +57,7 @@
 *******************************************************************************/
 unsigned char I2C_Init(unsigned long clockFreq)
 {
-    /* Add your code here. */
+    return 0;
 }
 
 /***************************************************************************//**
@@ -74,7 +77,7 @@ unsigned char I2C_Write(unsigned char slaveAddress,
                         unsigned char bytesNumber,
                         unsigned char stopBit)
 {
-    /* Add your code here. */
+	return 0;
 }
 
 /***************************************************************************//**
@@ -94,7 +97,7 @@ unsigned char I2C_Read(unsigned char slaveAddress,
                        unsigned char bytesNumber,
                        unsigned char stopBit)
 {
-    /* Add your code here. */
+    return 0;
 }
 
 /***************************************************************************//**
@@ -125,7 +128,7 @@ unsigned char SPI_Init(unsigned char lsbFirst,
                        unsigned char clockPol,
                        unsigned char clockEdg)
 {
-    /* Add your code here. */
+    return 1;
 }
 
 /***************************************************************************//**
@@ -142,7 +145,11 @@ unsigned char SPI_Read(unsigned char slaveDeviceId,
                        unsigned char* data,
                        unsigned char bytesNumber)
 {
-    /* Add your code here. */
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
+	HAL_SPI_Transmit(&hspi1, data, 1, 0x1000);
+	HAL_SPI_Receive(&hspi1, data, bytesNumber, 0x1000);
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
+	return bytesNumber;
 }
 
 /***************************************************************************//**
@@ -158,5 +165,8 @@ unsigned char SPI_Write(unsigned char slaveDeviceId,
                         unsigned char* data,
                         unsigned char bytesNumber)
 {
-    /* Add your code here. */
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
+	HAL_SPI_Transmit(&hspi1, data, bytesNumber, 0x1000);
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
+	return bytesNumber;
 }

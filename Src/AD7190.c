@@ -97,17 +97,17 @@ unsigned long AD7190_GetRegisterValue(unsigned char registerAddress,
     
     registerWord[0] = AD7190_COMM_READ |
                       AD7190_COMM_ADDR(registerAddress);
-    sprintf(display,"%d", registerWord[0]);
+   /* sprintf(display,"%d", registerWord[0]);
     clearScreen();
     ssd1306_WriteString(display, 1);
-    updateScreen();
+    updateScreen();*/
 
     SPI_Read(AD7190_SLAVE_ID * modifyCS, registerWord, bytesNumber/* + 1*/);
 
-    sprintf(display,"%d", registerWord[0]);
+   /* sprintf(display,"%d", registerWord[0]);
     clearScreen();
     ssd1306_WriteString(display, 1);
-    updateScreen();
+    updateScreen();*/
     for(/*i = 1; */i = 0; i < bytesNumber/* + 1*/; i++)
     {
         buffer = (buffer << 8) + registerWord[i];
@@ -323,7 +323,7 @@ unsigned long AD7190_TemperatureRead(void)
     unsigned char temperature = 0x0;
     unsigned long dataReg = 0x0;
     
-//    AD7190_RangeSetup(0, AD7190_CONF_GAIN_1);
+    AD7190_RangeSetup(0, AD7190_CONF_GAIN_1);
     AD7190_ChannelSelect(AD7190_CH_TEMP_SENSOR);
     dataReg = AD7190_SingleConversion();
     dataReg -= 0x800000;

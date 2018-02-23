@@ -104,8 +104,8 @@ int main(void)
   /* USER CODE BEGIN 2 */
   ssd1306Init();
   clearScreen();
-  ssd1306_WriteString("TEST", 1);
-  updateScreen();
+  /*ssd1306_WriteString("TEST", 1);
+  updateScreen();*/
 
   if(AD7190_Init())
   {
@@ -118,19 +118,26 @@ int main(void)
 	  updateScreen();
   }
 
-  buffer = AD7190_GetRegisterValue(AD7190_REG_CONF,3, 1);
+  HAL_Delay(500);
+  /*buffer = AD7190_GetRegisterValue(AD7190_REG_CONF,3, 1);
   sprintf(display,"%lu", buffer);
   clearScreen();
   ssd1306_WriteString(display, 1);
-  updateScreen();
+  updateScreen();*/
 
-  buffer = AD7190_TemperatureRead();
-  sprintf(display,"%lu", buffer);
+  /*buffer = AD7190_TemperatureRead();
+  sprintf(display,"%lu C", buffer);
   clearScreen();
   ssd1306_WriteString(display, 1);
   updateScreen();
+  HAL_Delay(500);*/
+  AD7190_RangeSetup(0, AD7190_CONF_GAIN_1);
+  //AD7190_Calibrate(AD7190_MODE_CAL_INT_ZERO, AD7190_CH_AIN1P_AIN2M);
+  //AD7190_Calibrate(AD7190_MODE_CAL_INT_FULL, AD7190_CH_AIN1P_AIN2M);
+
+
+
   /* USER CODE END 2 */
-
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
@@ -138,7 +145,30 @@ int main(void)
   /* USER CODE END WHILE */
 	  /*	 AD7190_Reset();
 	  	 HAL_Delay(1);*/
+	  /*buffer = AD7190_TemperatureRead();
+	  sprintf(display,"%lu C", buffer);
+	  clearScreen();
+	  ssd1306_WriteString(display, 1);
+	  updateScreen();
+	  HAL_Delay(500);*/
+	  //AD7190_RangeSetup(0, AD7190_CONF_GAIN_1);
+	  AD7190_ChannelSelect(AD7190_CH_AIN1P_AIN2M);
+	  buffer = AD7190_SingleConversion();
+	  //buffer = AD7190_ContinuousReadAvg(50);
+	  sprintf(display,"%lu", buffer);
+	  clearScreen();
+	  ssd1306_WriteString(display, 1);
+	  updateScreen();
+	  HAL_Delay(500);
 
+	  /*AD7190_ChannelSelect(AD7190_CH_AIN1P_AIN2M);
+	  buffer = AD7190_SingleConversion();
+	  //buffer = AD7190_ContinuousReadAvg(50);
+	  sprintf(display,"%lu", buffer);
+	  clearScreen();
+	  ssd1306_WriteString(display, 1);
+	  updateScreen();
+	  HAL_Delay(500);*/
 
   /* USER CODE BEGIN 3 */
 

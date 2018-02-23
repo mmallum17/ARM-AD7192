@@ -166,7 +166,7 @@ unsigned char SPI_Write(unsigned char slaveDeviceId,
                         unsigned char bytesNumber)
 {
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
-	HAL_SPI_Transmit(&hspi1, data, bytesNumber, 0x1000);
+	HAL_SPI_Transmit(&hspi1, data, bytesNumber - 1, 0x1000);
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
 	return bytesNumber;
 }

@@ -149,7 +149,7 @@
 #define AD7190_CONF_GAIN_128	7 // Gain 128  +-39.06 mV
 
 /* ID Register Bit Designations (AD7190_REG_ID) */
-#define ID_AD7190               0x4
+#define ID_AD7190               0x0
 #define AD7190_ID_MASK          0x0F
 
 /* GPOCON Register Bit Designations (AD7190_REG_GPOCON) */

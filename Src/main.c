@@ -43,6 +43,7 @@
 /* USER CODE BEGIN Includes */
 #include "ssd1306.h"
 #include "AD7190.h"
+#include <math.h>
 
 /* USER CODE END Includes */
 
@@ -64,7 +65,7 @@ static void MX_SPI1_Init(void);
 
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
-
+void floatToString(float value, char* floatString, int afterpoint);
 /* USER CODE END PFP */
 
 /* USER CODE BEGIN 0 */
@@ -85,6 +86,8 @@ int main(void)
 
   /* USER CODE BEGIN Init */
   unsigned long buffer;
+  float voltage;
+  char voltString[20];
   char display[30];
 
   /* USER CODE END Init */
@@ -106,7 +109,7 @@ int main(void)
   clearScreen();
   /*ssd1306_WriteString("TEST", 1);
   updateScreen();*/
-  HAL_Delay(3000);
+  //HAL_Delay(3000);
   if(AD7190_Init())
   {
 	  ssd1306_WriteString("Part Present", 1);
@@ -119,48 +122,46 @@ int main(void)
   }
 
   HAL_Delay(500);
-  /*buffer = AD7190_GetRegisterValue(AD7190_REG_CONF,3, 1);
-  sprintf(display,"%lu", buffer);
-  clearScreen();
-  ssd1306_WriteString(display, 1);
-  updateScreen();*/
 
-  /*buffer = AD7190_TemperatureRead();
-  sprintf(display,"%lu C", buffer);
-  clearScreen();
-  ssd1306_WriteString(display, 1);
-  updateScreen();
-  HAL_Delay(500);*/
   AD7190_RangeSetup(1, AD7190_CONF_GAIN_1);
+  //AD7190_ChannelSelect(AD7190_CH_AIN3P_AIN4M);
   //AD7190_Calibrate(AD7190_MODE_CAL_INT_ZERO, AD7190_CH_AIN3P_AIN2M);
   //AD7190_Calibrate(AD7190_MODE_CAL_INT_FULL, AD7190_CH_AIN3P_AIN2M);
 
-
-
   /* USER CODE END 2 */
+
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
   /* USER CODE END WHILE */
-	  /*	 AD7190_Reset();
-	  	 HAL_Delay(1);*/
-	  /*buffer = AD7190_TemperatureRead();
-	  sprintf(display,"%lu C", buffer);
+	  //AD7190_RangeSetup(1, AD7190_CONF_GAIN_1);
+	  //AD7190_ChannelSelect(AD7190_CH_AIN3P_AIN4M);
+	  AD7190_ChannelSelect(AD7190_CH_AIN1P_AIN2M);
+	  buffer = AD7190_SingleConversion();
+	  voltage = ((float)buffer / 16777216ul) * 5;
+	  //voltage = 3.4;
+	  //voltage = buffer;
+	  floatToString(voltage, voltString, 2);
+	  //buffer = AD7190_ContinuousReadAvg(50);
+	  //sprintf(display,"%lu", buffer);
+	  sprintf(display,"%s V", voltString);
 	  clearScreen();
 	  ssd1306_WriteString(display, 1);
 	  updateScreen();
-	  HAL_Delay(500);*/
-	  AD7190_RangeSetup(1, AD7190_CONF_GAIN_1);
+
 	  AD7190_ChannelSelect(AD7190_CH_AIN3P_AIN4M);
 	  buffer = AD7190_SingleConversion();
+	  voltage = ((float)buffer / 16777216ul) * 5;
+	  floatToString(voltage, voltString, 2);
 	  //buffer = AD7190_ContinuousReadAvg(50);
-	  sprintf(display,"%lu", buffer);
-	  clearScreen();
+	  //sprintf(display,"%lu", buffer);
+	  sprintf(display,"%s V", voltString);
+	  setCursorX(0);
+	  setCursorY(11);
 	  ssd1306_WriteString(display, 1);
 	  updateScreen();
 	  HAL_Delay(500);
-
 	  /*AD7190_ChannelSelect(AD7190_CH_AIN1P_AIN2M);
 	  buffer = AD7190_SingleConversion();
 	  //buffer = AD7190_ContinuousReadAvg(50);
@@ -311,7 +312,14 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+void floatToString(float value, char* floatString, int afterpoint)
+{
+	uint32_t intValue = value;
+	float tmpFrac = value - intValue;
+	uint32_t intFrac = trunc(tmpFrac * pow(10, afterpoint));
 
+	sprintf(floatString, "%lu.%lu", intValue, intFrac);
+}
 /* USER CODE END 4 */
 
 /**

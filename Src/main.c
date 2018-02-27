@@ -106,7 +106,7 @@ int main(void)
   clearScreen();
   /*ssd1306_WriteString("TEST", 1);
   updateScreen();*/
-
+  HAL_Delay(3000);
   if(AD7190_Init())
   {
 	  ssd1306_WriteString("Part Present", 1);
@@ -131,9 +131,9 @@ int main(void)
   ssd1306_WriteString(display, 1);
   updateScreen();
   HAL_Delay(500);*/
-  AD7190_RangeSetup(0, AD7190_CONF_GAIN_1);
-  //AD7190_Calibrate(AD7190_MODE_CAL_INT_ZERO, AD7190_CH_AIN1P_AIN2M);
-  //AD7190_Calibrate(AD7190_MODE_CAL_INT_FULL, AD7190_CH_AIN1P_AIN2M);
+  AD7190_RangeSetup(1, AD7190_CONF_GAIN_1);
+  //AD7190_Calibrate(AD7190_MODE_CAL_INT_ZERO, AD7190_CH_AIN3P_AIN2M);
+  //AD7190_Calibrate(AD7190_MODE_CAL_INT_FULL, AD7190_CH_AIN3P_AIN2M);
 
 
 
@@ -151,8 +151,8 @@ int main(void)
 	  ssd1306_WriteString(display, 1);
 	  updateScreen();
 	  HAL_Delay(500);*/
-	  //AD7190_RangeSetup(0, AD7190_CONF_GAIN_1);
-	  AD7190_ChannelSelect(AD7190_CH_AIN1P_AIN2M);
+	  AD7190_RangeSetup(1, AD7190_CONF_GAIN_1);
+	  AD7190_ChannelSelect(AD7190_CH_AIN3P_AIN4M);
 	  buffer = AD7190_SingleConversion();
 	  //buffer = AD7190_ContinuousReadAvg(50);
 	  sprintf(display,"%lu", buffer);

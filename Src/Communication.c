@@ -145,8 +145,13 @@ unsigned char SPI_Read(unsigned char slaveDeviceId,
                        unsigned char* data,
                        unsigned char bytesNumber)
 {
+	uint8_t i;
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
 	HAL_SPI_Transmit(&hspi1, data, 1, 0x1000);
+	for(i = 0; i < bytesNumber; i++)
+	{
+		data[i] = 0xFF;
+	}
 	HAL_SPI_Receive(&hspi1, data, bytesNumber, 0x1000);
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
 	return bytesNumber;
@@ -166,7 +171,7 @@ unsigned char SPI_Write(unsigned char slaveDeviceId,
                         unsigned char bytesNumber)
 {
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
-	HAL_SPI_Transmit(&hspi1, data, bytesNumber - 1, 0x1000);
+	HAL_SPI_Transmit(&hspi1, data, bytesNumber, 0x1000);
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
 	return bytesNumber;
 }
